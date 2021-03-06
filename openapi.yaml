@@ -1,0 +1,727 @@
+﻿openapi: 3.0.1
+info:
+  title: Mops Rozklad
+  version: 1.2.0  
+  description: |  
+    Mops Rozklad
+    # Introduction
+    This is backend for mops.life service 
+    You can find our service on 
+    [Dev Server](http://157.230.16.185) or [Prod Server](http://mops.life)
+    
+    # Authentification
+    All request that can access user-specific data need to have authentification 
+    We have bearer-based auth, so need to add header 
+
+    [Login Page Design(unfinished)](https://www.figma.com/file/iQFCw6HJZlH9BFpGiXf26V/Rozklad?node-id=582%3A1542)  
+    Authorization : Bearer {access token here}
+
+    To get Access Token need to make user [login](Login)
+
+    ## Register 
+      Currently we support google-based registration and ~~email-based registration~~(in progress)
+
+      For registration with google need to : 
+      - user click on GOOGLE button  
+      - field to input groupName  
+      [Request for register with google account](#tag/Auth/paths/~1api~1student~1register~1google/post)
+    ## Login
+      For login we support google-login 
+      
+      On Login user just need hit google button 
+
+      [Request for google-login](#tag/Auth/paths/~1api~1student~1login~1google/post)
+    
+
+    
+
+paths:
+  /api/student/group:
+    get:
+      tags:
+        - Auth
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: '#/components/schemas/TelegramUser'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TelegramUser'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/TelegramUser'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/TelegramUser'
+      responses:
+        '200':
+          description: Success
+  /api/student/telegram:
+    post:
+      tags:
+        - Auth
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: '#/components/schemas/TelegramAuthModel'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TelegramAuthModel'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/TelegramAuthModel'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/TelegramAuthModel'
+      responses:
+        '200':
+          description: Success
+  /api/student/register/google:
+    post:
+      summary: Google register
+      tags:
+        - Auth
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: '#/components/schemas/GoogleRegisterModel'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoogleRegisterModel'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/GoogleRegisterModel'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/GoogleRegisterModel'
+      responses:
+        '200':
+          description: Success
+  /api/student/login/google:
+    post:
+      summary: Google login
+      tags:
+        - Auth
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: '#/components/schemas/GoogleLoginModel'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoogleLoginModel'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/GoogleLoginModel'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/GoogleLoginModel'
+      responses:
+        '200':
+          description: Success
+  /api/student/refresh-token:
+    post:
+      tags:
+        - Auth
+      responses:
+        '200':
+          description: Success
+  /api/student/revoke-token:
+    post:
+      tags:
+        - Auth
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: '#/components/schemas/RevokeTokenRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RevokeTokenRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/RevokeTokenRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/RevokeTokenRequest'
+      responses:
+        '200':
+          description: Success
+  /api/groups:
+    get:
+      tags:
+        - Groups
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  type: string
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+            text/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  '/api/groups/{groupName}/timetable':
+    get:
+      tags:
+        - Groups
+      parameters:
+        - name: groupName
+          in: path
+          required: true
+          schema:
+            type: string
+            nullable: true
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubjectDto'
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubjectDto'
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubjectDto'
+  '/api/student/{studentId}/notifications':
+    post:
+      tags:
+        - NotificationForStudent
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: '#/components/schemas/NotificationsModel'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationsModel'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/NotificationsModel'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/NotificationsModel'
+      responses:
+        '200':
+          description: Success
+  '/api/subject/{subjectId}':
+    patch:
+      tags:
+        - Subjects
+      parameters:
+        - name: subjectId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Operation'
+              nullable: true
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Operation'
+              nullable: true
+          text/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Operation'
+              nullable: true
+          application/*+json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Operation'
+              nullable: true
+      responses:
+        '200':
+          description: Success
+  '/api/student/{studentId}/subjects/{subjectId}/links':
+    post:
+      tags:
+        - SubjectsForStudent
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: subjectId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              $ref: '#/components/schemas/PostLinksDto'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostLinksDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/PostLinksDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/PostLinksDto'
+      responses:
+        '200':
+          description: Success
+  '/api/student/{studentId}/subjects':
+    get:
+      tags:
+        - SubjectsForStudent
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubjectDto'
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubjectDto'
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubjectDto'
+  '/api/student/{studentId}/subjects/disabled':
+    get:
+      tags:
+        - SubjectsForStudent
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubjectDto'
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubjectDto'
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubjectDto'
+  '/api/student/{studentId}/subjects/{subjectId}/disable':
+    patch:
+      tags:
+        - SubjectsForStudent
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: subjectId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+  '/api/student/{studentId}/subjects/{subjectId}/enable':
+    patch:
+      tags:
+        - SubjectsForStudent
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: subjectId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+  '/api/student/{studentId}/subjects/{subjectId}/mute':
+    patch:
+      tags:
+        - SubjectsForStudent
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: subjectId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+  '/api/student/{studentId}/subjects/{subjectId}/unmute':
+    patch:
+      tags:
+        - SubjectsForStudent
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: subjectId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+  '/api/student/{studentId}/timetable':
+    get:
+      tags:
+        - TimeTable
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubjectDto'
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubjectDto'
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubjectDto'
+  '/api/week/{date}':
+    get:
+      tags:
+        - Week
+      parameters:
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/WeekDto'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeekDto'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/WeekDto'
+components:
+  schemas:
+    TelegramUser:
+      type: object
+      properties:
+        auth_date:
+          type: integer
+          format: int64
+        first_name:
+          type: string
+          nullable: true
+        hash:
+          type: string
+          nullable: true
+        id:
+          type: integer
+          format: int64
+        last_name:
+          type: string
+          nullable: true
+        photo_url:
+          type: string
+          nullable: true
+        username:
+          type: string
+          nullable: true
+      additionalProperties: false
+    TelegramAuthModel:
+      type: object
+      properties:
+        telegramUser:
+          $ref: '#/components/schemas/TelegramUser'
+        group:
+          type: string
+          nullable: true
+      additionalProperties: false
+    GoogleLoginModel:
+      type: object
+      properties:
+        code:
+          description: auth code, that we get from google-button(field 'code')
+          type: string
+          nullable: false
+      additionalProperties: false
+    GoogleRegisterModel:
+      type: object
+      properties:
+        code:
+          description: auth code, that we get from google-button(field 'code')
+          type: string
+          nullable: false
+        groupName:
+          description: name of group selected by user 
+          type: string
+          nullable: false
+      additionalProperties: false
+    RevokeTokenRequest:
+      type: object
+      properties:
+        token:
+          type: string
+          nullable: true
+      additionalProperties: false
+    SubjectDto:
+      required:
+        - name
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        name:
+          type: string
+        teachers:
+          type: string
+          nullable: true
+        lessonsZoom:
+          type: string
+          nullable: true
+        labsZoom:
+          type: string
+          nullable: true
+        isRequired:
+          type: boolean
+        lessonsAccessCode:
+          type: string
+          nullable: true
+        labsAccessCode:
+          type: string
+          nullable: true
+      additionalProperties: false
+    NotificationsModel:
+      required:
+        - isNotificationsOn
+        - notificationType
+        - timeBeforeLesson
+      type: object
+      properties:
+        isNotificationsOn:
+          type: boolean
+        timeBeforeLesson:
+          maximum: 30
+          minimum: 5
+          type: integer
+          format: int32
+        notificationType:
+          type: string
+      additionalProperties: false
+    OperationType:
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+      type: integer
+      format: int32
+    Operation:
+      type: object
+      properties:
+        operationType:
+          $ref: '#/components/schemas/OperationType'
+        path:
+          type: string
+          nullable: true
+        op:
+          type: string
+          nullable: true
+        from:
+          type: string
+          nullable: true
+        value:
+          nullable: true
+      additionalProperties: false
+    PostLinksDto:
+      type: object
+      properties:
+        lessonsLink:
+          type: string
+          nullable: true
+        labsLink:
+          type: string
+          nullable: true
+        lessonsAccessCode:
+          type: string
+          nullable: true
+        labsAccessCode:
+          type: string
+          nullable: true
+      additionalProperties: false
+    Subject:
+      required:
+        - name
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        groupId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        teachers:
+          type: string
+          nullable: true
+        lessons:
+          type: array
+          items:
+            $ref: '#/components/schemas/Lesson'
+          nullable: true
+      additionalProperties: false
+    Lesson:
+      required:
+        - dayOfWeek
+        - subjectId
+        - timeStart
+        - week
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        subjectId:
+          type: string
+          format: uuid
+        subject:
+          $ref: '#/components/schemas/Subject'
+        week:
+          type: integer
+          format: int32
+        dayOfWeek:
+          type: integer
+          format: int32
+        timeStart:
+          type: string
+        type:
+          type: string
+          nullable: true
+      additionalProperties: false
+    DayDto:
+      type: object
+      properties:
+        dayNumber:
+          type: integer
+          format: int32
+        lessons:
+          type: array
+          items:
+            $ref: '#/components/schemas/Lesson'
+          nullable: true
+      additionalProperties: false
+    WeekDto:
+      type: object
+      properties:
+        weekNumber:
+          type: integer
+          format: int32
+        days:
+          type: array
+          items:
+            $ref: '#/components/schemas/DayDto'
+          nullable: true
+      additionalProperties: false
