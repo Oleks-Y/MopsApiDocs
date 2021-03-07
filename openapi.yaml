@@ -8,6 +8,7 @@ info:
     This is backend for mops.life service 
     You can find our service on 
     [Dev Server](http://157.230.16.185) or [Prod Server](http://mops.life)
+    For API we using 5000 port 
     
     # Authentification
     All request that can access user-specific data need to have authentification 
@@ -31,10 +32,24 @@ info:
       On Login user just need hit google button 
 
       [Request for google-login](#tag/Auth/paths/~1api~1student~1login~1google/post)
-    
+    # Operations with subjects 
 
-    
+    ## Subject links 
 
+    Student can set specific links for some subject 
+
+    They`re individual and then he can share them with group
+
+    [Request for set links](#tag/SubjectsForStudent/paths/~1api~1student~1{studentId}~1subjects~1{subjectId}~1links/post)
+    
+    Links are nested in subject entity, and you can get them [here](#tag/SubjectsForStudent/paths/~1api~1student~1{studentId}~1subjects/get)
+
+    # Notes 
+
+    Documentation in development, and 
+
+    - response codes is different from actual responses from api 
+    - not specified where need authorization  
 paths:
   /api/student/group:
     get:
@@ -273,6 +288,8 @@ paths:
           description: Success
   '/api/student/{studentId}/subjects/{subjectId}/links':
     post:
+      summary: Update subject links for specific user 
+      description: In body set only fields, that need to update, skip all other ( this method like POST-PATCH)
       tags:
         - SubjectsForStudent
       parameters:
@@ -307,6 +324,7 @@ paths:
           description: Success
   '/api/student/{studentId}/subjects':
     get:
+      summary: Get all subjects with links for some student
       tags:
         - SubjectsForStudent
       parameters:
